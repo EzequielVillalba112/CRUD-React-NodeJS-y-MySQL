@@ -65,6 +65,22 @@ app.put("/update", (req, res) => {
   );
 });
 
+app.delete("/delete/:id", (req, res) => {
+  const id = req.params.id;
+ 
+  db.query(
+    "DELETE FROM empleados WHERE id=?",
+    [id],
+    (error) => {
+      if (error) {
+        console.log(error);
+      } else {
+        res.send("Emplado Eliminado");
+      }
+    }
+  );
+});
+
 app.listen(PORT, () => {
   console.log(`server listening on port http://localhost:${PORT}`);
 });

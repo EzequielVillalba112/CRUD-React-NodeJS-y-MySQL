@@ -4,6 +4,10 @@ import Axios from "axios";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { MdDelete } from "react-icons/md";
 import { PiNotePencilLight } from "react-icons/pi";
+import Swal from "sweetalert2";
+import withReactContent from "sweetalert2-react-content";
+
+const notificacion = withReactContent(Swal);
 
 export default function Formulario() {
   const [nombre, setNombre] = useState("");
@@ -22,11 +26,16 @@ export default function Formulario() {
       edad: edad,
       cargo: cargo,
       anio: anios,
+    }).then(() => {
+      notificacion.fire({
+        title: "Se guardo de forma correcta!",
+        icon: "success",
+        background: "#000",
+        color: "#fff",
+        confirmButtonColor: "#29C716",
+      });
     });
-    setNombre("");
-    setEdad("");
-    setCargo("");
-    setAnios("");
+    limpiarCampos();
   };
 
   const update = () => {
@@ -36,11 +45,61 @@ export default function Formulario() {
       edad: edad,
       cargo: cargo,
       anio: anios,
+    }).then(() => {
+      notificacion.fire({
+        title: "Se modifico de forma correcta!",
+        icon: "success",
+        background: "#000",
+        color: "#fff",
+        confirmButtonColor: "#29C716",
+      });
     });
-    setNombre("");
-    setEdad("");
-    setCargo("");
-    setAnios("");
+    limpiarCampos();
+  };
+
+  const eliminarEmpleado = (id) => {
+    notificacion
+      .fire({
+        title: "Desea eliminar el empleado?",
+        showDenyButton: true,
+        showCancelButton: true,
+        confirmButtonText: "Si",
+        denyButtonText: `no`,
+        background: "#000",
+        color: "#fff",
+        confirmButtonColor: "#29C716",
+      })
+      .then((result) => {
+        /* Read more about isConfirmed, isDenied below */
+        if (result.isConfirmed) {
+          Axios.delete(`http://localhost:3000/delete/${id}`).then(() => {
+            Swal.fire({
+              title: "Empleado Eliminado",
+              icon: "success",
+              background: "#000",
+              color: "#fff",
+              confirmButtonColor: "#29C716",
+            });
+          }).catch(function(error){
+            notificacion.fire({
+              icon: "error",
+              title: "Oops...",
+              text: "No se pudo eliminar el empleado",
+              background: "#000",
+              color: "#fff",
+            });
+          });
+          
+        } else if (result.isDenied) {
+          Swal.fire({
+            title: "No se elimino ningun empleado",
+            icon: "info",
+            background: "#000",
+            color: "#fff",
+            confirmButtonColor: "#29C716",
+          });
+        }
+      });
   };
 
   useEffect(() => {
@@ -56,6 +115,18 @@ export default function Formulario() {
     setCargo(val.cargo);
     setAnios(val.anios);
     setId(val.id);
+  };
+
+  const cancelarEdit = () => {
+    setEditar(!editar);
+    limpiarCampos();
+  };
+
+  const limpiarCampos = () => {
+    setNombre("");
+    setEdad("");
+    setCargo("");
+    setAnios("");
   };
 
   return (
@@ -137,7 +208,7 @@ export default function Formulario() {
               <button onClick={update} className="btn btn-warning">
                 Editar
               </button>
-              <button className="btn btn-danger m-lg-2">
+              <button onClick={cancelarEdit} className="btn btn-danger m-lg-2">
                 Cancelar
               </button>
             </>
@@ -169,15 +240,20 @@ export default function Formulario() {
               <td>{emplado.cargo}</td>
               <td>{emplado.anios}</td>
               <td>
-                <button className="btn btn-primary">
-                  <PiNotePencilLight
-                    size="1.5em"
-                    onClick={() => {
-                      editarEmpleado(emplado);
-                    }}
-                  />
+                <button
+                  className="btn btn-primary"
+                  onClick={() => {
+                    editarEmpleado(emplado);
+                  }}
+                >
+                  <PiNotePencilLight size="1.5em" />
                 </button>
-                <button className="btn btn-danger m-lg-2 ">
+                <button
+                  className="btn btn-danger m-lg-2 "
+                  onClick={() => {
+                    eliminarEmpleado(emplado.id);
+                  }}
+                >
                   <MdDelete size="1.5em" />
                 </button>
               </td>
