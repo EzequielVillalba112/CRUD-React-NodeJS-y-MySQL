@@ -81,6 +81,21 @@ app.delete("/delete/:id", (req, res) => {
   );
 });
 
+
+app.get("/buscar/:name", (req, res) => {
+  const nombre = req.params.name;
+ 
+  db.query(`SELECT * FROM empleados WHERE nombre LIKE '%${nombre}%' LIMIT 3`,
+  (error, result) => {
+    if (error) {
+      console.log(error);
+    } else {
+      console.log(result);
+      res.json(result);
+    }
+  });
+});
+
 app.listen(PORT, () => {
   console.log(`server listening on port http://localhost:${PORT}`);
 });

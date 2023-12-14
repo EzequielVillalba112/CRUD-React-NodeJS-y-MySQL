@@ -6,6 +6,8 @@ import { MdDelete } from "react-icons/md";
 import { PiNotePencilLight } from "react-icons/pi";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
+import { FaSearch } from "react-icons/fa";
+import ListEmpleado from "./ListEmpleado";
 
 const notificacion = withReactContent(Swal);
 
@@ -19,6 +21,8 @@ export default function Formulario() {
   const [editar, setEditar] = useState(false);
 
   const [empladosList, setEmpleadosList] = useState([]);
+  const [busqueda, setBusqueda] = useState("");
+
 
   const add = () => {
     Axios.post(`http://localhost:3000/create`, {
@@ -72,24 +76,25 @@ export default function Formulario() {
       .then((result) => {
         /* Read more about isConfirmed, isDenied below */
         if (result.isConfirmed) {
-          Axios.delete(`http://localhost:3000/delete/${id}`).then(() => {
-            Swal.fire({
-              title: "Empleado Eliminado",
-              icon: "success",
-              background: "#000",
-              color: "#fff",
-              confirmButtonColor: "#29C716",
+          Axios.delete(`http://localhost:3000/delete/${id}`)
+            .then(() => {
+              Swal.fire({
+                title: "Empleado Eliminado",
+                icon: "success",
+                background: "#000",
+                color: "#fff",
+                confirmButtonColor: "#29C716",
+              });
+            })
+            .catch(function (error) {
+              notificacion.fire({
+                icon: "error",
+                title: "Oops...",
+                text: "No se pudo eliminar el empleado",
+                background: "#000",
+                color: "#fff",
+              });
             });
-          }).catch(function(error){
-            notificacion.fire({
-              icon: "error",
-              title: "Oops...",
-              text: "No se pudo eliminar el empleado",
-              background: "#000",
-              color: "#fff",
-            });
-          });
-          
         } else if (result.isDenied) {
           Swal.fire({
             title: "No se elimino ningun empleado",
@@ -106,7 +111,19 @@ export default function Formulario() {
     Axios.get(`http://localhost:3000/empleados`).then((response) => {
       setEmpleadosList(response.data);
     });
-  }, [empladosList]);
+  }, [busqueda == ""]);
+
+  const buscarEmpl = (empleado = "") => {
+    if(empleado != ""){
+      fetch(`http://localhost:3000/buscar/${empleado}`)
+      .then((r) => {
+        return r.json();
+      })
+      .then((response) => {
+       setEmpleadosList(response)
+      });
+    }
+  };
 
   const editarEmpleado = (val) => {
     setEditar(true);
@@ -219,6 +236,30 @@ export default function Formulario() {
           )}
         </div>
       </div>
+
+      <div className="input-group mb-3 mt-4 ">
+        <input
+          type="text"
+          onChange={(e) => {
+            buscarEmpl(e.target.value);
+            setBusqueda(e.target.value);
+          }}
+          className="form-control"
+          placeholder="Buscar por nombre"
+          aria-label="Recipient's username"
+          aria-describedby="button-addon2"
+        />
+        <button
+          className="btn  btn-primary"
+          type="button"
+          id="button-addon2"
+         
+        >
+          <FaSearch color="#ffff" />
+        </button>
+      </div>
+
+     
 
       <table className="table table-striped-columns text-center mt-4 ">
         <thead>
