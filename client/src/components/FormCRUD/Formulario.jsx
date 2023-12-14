@@ -7,7 +7,6 @@ import { PiNotePencilLight } from "react-icons/pi";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
 import { FaSearch } from "react-icons/fa";
-import ListEmpleado from "./ListEmpleado";
 
 const notificacion = withReactContent(Swal);
 
@@ -22,7 +21,6 @@ export default function Formulario() {
 
   const [empladosList, setEmpleadosList] = useState([]);
   const [busqueda, setBusqueda] = useState("");
-
 
   const add = () => {
     Axios.post(`http://localhost:3000/create`, {
@@ -114,14 +112,14 @@ export default function Formulario() {
   }, [busqueda == ""]);
 
   const buscarEmpl = (empleado = "") => {
-    if(empleado != ""){
+    if (empleado != "") {
       fetch(`http://localhost:3000/buscar/${empleado}`)
-      .then((r) => {
-        return r.json();
-      })
-      .then((response) => {
-       setEmpleadosList(response)
-      });
+        .then((r) => {
+          return r.json();
+        })
+        .then((response) => {
+          setEmpleadosList(response);
+        });
     }
   };
 
@@ -249,17 +247,7 @@ export default function Formulario() {
           aria-label="Recipient's username"
           aria-describedby="button-addon2"
         />
-        <button
-          className="btn  btn-primary"
-          type="button"
-          id="button-addon2"
-         
-        >
-          <FaSearch color="#ffff" />
-        </button>
       </div>
-
-     
 
       <table className="table table-striped-columns text-center mt-4 ">
         <thead>
